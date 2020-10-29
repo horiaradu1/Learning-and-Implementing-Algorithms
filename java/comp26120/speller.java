@@ -176,11 +176,11 @@ public abstract class speller {
 		//Now tidy everything up
 		dict_scanner.close();
 		text_scanner.close();
-	    } catch (Exception e) {
+	    } catch (IOException e) {
 		System.err.format("%s: Can't open %s\n", speller.prog_name, speller.file_name());
 		System.exit(3);
 	    }
-	} catch (Exception e) {
+	} catch (IOException e) {
 	    System.err.format("%s: Can't open %s\n", speller.prog_name, speller.dict_file_name());
 	    System.exit(3);
 	}
