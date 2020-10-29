@@ -216,8 +216,8 @@ int main (int argc, char *argv[])
     { // call with option -vvv to get this
       print_set (words);
     }
-    printf("Spellchecking:\n");
   }
+  printf("Spellchecking:\n");
 
   init_get_next_lower_word ();
   while ((word= get_next_lower_word (text_file))) 
