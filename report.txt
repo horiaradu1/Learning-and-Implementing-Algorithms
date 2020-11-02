@@ -1,0 +1,133 @@
+Name: 
+
+
+This file has been provided to help you structure your write-up of Lab 2. Some questions can be answered with a single sentence, some may require much longer answers. You are free to edit/rearrange this file as much as you want.
+
+All questions should be answered for each of your chosen sorting algorithms. You should do this for at least insertion sort but ideally quick sort as well.
+
+========================================================================================
+Experiment 1
+========================================================================================
+
+
+------------------------
+Initial Expectations
+------------------------
+
+>> What do you expect the best and worst cases to be? 
+
+
+
+>> Do you expect the constants to be the same for the best and worst cases? 
+
+
+
+>> Do you expect the average case to be closer to best or worst case? 
+
+
+------------------------
+Experimental Design
+------------------------
+
+>> What are the best and worst cases and what are their theoretical complexities? 
+
+
+
+>> What average case will you consider, in what way can it be considered average? 
+
+
+
+>> Which data will you use to compute f(n) for best, worst, and average cases?
+
+
+
+>> How will you compute f(n) for the best, worst, and average cases? 
+
+
+
+>> How will you validate your findings?
+
+
+
+------------------------
+Results and Analysis
+------------------------
+
+>> What are your computed functions and what data did you use to compute them? 
+
+
+
+>> Do the best and worst case use the some constants? Why do you think this is? 
+
+
+
+>> Is the average case closer to the best or worst case? Why do you think this is?
+
+
+
+========================================================================================
+Experiment 2
+========================================================================================
+
+------------------------
+Initial Expectations
+------------------------
+
+>> Do you expect sorting + binary search to beat linear search on all inputs, most inputs, some inputs? Why? 
+
+
+
+>> Do you expect your answer to change for different sorting algorithms? Why?
+
+
+
+>> Do you expect your answer to change if the dictionary is in the best/worst case for sorting? Why?
+
+
+
+>> Do you expect your answer to change based on the number of succesful queries? Why? 
+
+
+
+>> Can you phrase what you expect in terms of a one or two sentence hypothesis that you can test?
+
+------------------------
+Experimental Design
+------------------------
+
+>> What are the theoretical best/worst cases of searching and sorting methods involved? 
+
+
+
+>> Which conditions will you vary in your experiment? 
+
+
+
+
+>> How will you vary them? Why did you make these choices? Did you use the theoretical complexities to inform your decisions?
+
+
+
+
+>> How will you generate the data for your experiments? 
+
+
+
+------------------------
+Results and Analysis
+------------------------
+
+>> What results did you record?
+
+
+
+
+>> What does this tell you about the relationship between linear search and sorting + binary search?
+
+
+
+
+>> What is the answer to the question "Under what conditions is it better to perform linear search rather than binary search?"
+
+
+
