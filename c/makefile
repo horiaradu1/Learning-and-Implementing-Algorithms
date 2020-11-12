@@ -2,7 +2,7 @@ CFLAGS=-g -Wall
 LDFLAGS=-lm
 CC=gcc
 
-# "make darray", "make bstree" or "make hash" to compile your code
+# "make darray", "make bstree" or "make hashset" to compile your code
 
 darray: 
 	$(CC) $(CFLAGS) -DDARRAY $(LDFLAGS) global.c speller.c darray.c sorting.c -o speller_darray 
@@ -10,12 +10,12 @@ darray:
 bstree:
 	$(CC) $(CFLAGS) -DBSTREE $(LDFLAGS) global.c speller.c bstree.c -o speller_bstree
 
-hash: 
-	$(CC) $(CFLAGS) -DHASH $(LDFLAGS) global.c speller.c hashset.c -o speller_hash
+hashset: 
+	$(CC) $(CFLAGS) -DHASH $(LDFLAGS) global.c speller.c hashset.c -o speller_hashset
 
 
 tidy:
-	-rm *.o speller_darray speller_bstree speller_hash 
+	-rm *.o speller_darray speller_bstree speller_hashset 
 
 .PHONY: darray bstree hash
 
