@@ -6,7 +6,7 @@ public class speller_config {
     String file_name;
     int verbose = 0;
     int mode;
-    int init_size;
+    int init_size = 507;
 
 
 }

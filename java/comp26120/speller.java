@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import comp26120.Getopt;
 import java.lang.Character;
+import java.io.FileNotFoundException;
 
 
 public abstract class speller {
@@ -176,14 +177,22 @@ public abstract class speller {
 		//Now tidy everything up
 		dict_scanner.close();
 		text_scanner.close();
-	    } catch (IOException e) {
-		System.err.format("%s: Can't open %s\n", speller.prog_name, speller.file_name());
+	    } catch (FileNotFoundException e) {
+		System.err.format("%s: Can't find %s \n", speller.prog_name, speller.file_name());
+		System.exit(3);
+	    } catch (Exception e) {
+		System.err.format("%s: Error \n", speller.prog_name);
+		e.printStackTrace();
 		System.exit(3);
 	    }
-	} catch (IOException e) {
-	    System.err.format("%s: Can't open %s\n", speller.prog_name, speller.dict_file_name());
+	} catch (FileNotFoundException e) {
+	    System.err.format("%s: Can't find %s\n", speller.prog_name, speller.dict_file_name());
 	    System.exit(3);
-	}
+	} catch (Exception e) {
+	    System.err.format("%s: Error \n", speller.prog_name);
+	    e.printStackTrace();
+	    System.exit(3);
+       }
 
         
         /* return 0; */
