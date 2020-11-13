@@ -64,7 +64,7 @@ query_hit=$(( $query_hit_percent * $query_len / 100 ))
 query_miss=$(( $query_len - query_hit ))
 echo "$query_hit query hits required"
 
-if (( $query_hit < 100 )) && [ $dict_len -eq $actual_dict_len ]
+if (( $query_hit_percent < 100 )) && [ $dict_len -eq $actual_dict_len ]
 then
   echo "to get a query hit percentage less than 100 we need some words not selected from the dictionary to use for the misses. Set required dictionary length to less than actual length."
   exit
