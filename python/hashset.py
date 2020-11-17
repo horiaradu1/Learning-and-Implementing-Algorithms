@@ -6,7 +6,7 @@ class hashset:
         # TODO: create initial hash table
         self.verbose = config.verbose
         self.mode = config.mode
-        self.size = config.init_size
+        self.hash_table_size = config.init_size
                 
     # Helper functions for finding prime numbers
     def isPrime(self, n):
@@ -14,6 +14,7 @@ class hashset:
         while (i * i < n):
             if (n % i == 0):
                 return False
+            i = i + 1
         return True
         
     def nextPrime(self, n):
@@ -21,9 +22,9 @@ class hashset:
             n = n + 1
         return n
         
-    def size(self):
+    # def size(self):
         # TODO return number of values stored in table
-        print("Placeholder")
+        # print("Placeholder")
 
     def insert(self, value):
         # TODO code for inserting into  hash table
