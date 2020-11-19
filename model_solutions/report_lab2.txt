@@ -1,0 +1,383 @@
+Name: Giles Reger 
+
+This is an example model solution but it is certainly not the only way to answer these questions. It is also not the 'best' way
+to answer them in the sense that I have (mostly) done what I expect most students to be able to do, not what you could do if you put
+extra effort or time into the lab. That being said, there are a few points where I've definitely gone a bit beyond what is necessary.
+
+The key points to take from this are (i) that in reality we have constant factors in these asymptotic complexities, and (ii) the 'best'
+solution depends on the context of the problem - complexity analysis often assumes big inputs but we don't always have big inputs.
+
+I answer the questions for both insertion sort and quick sort and am using the model solutions in C. Your answers may vary dramatically
+if you use different implementations of the sorting algorithms.
+
+========================================================================================
+Experiment 1
+========================================================================================
+
+
+------------------------
+Initial Expectations
+------------------------
+
+>> What do you expect the best and worst cases to be? 
+
+For insertion sort I expect the best case to be already sorted data as it should be linear e.g. I just compare the item to insert
+to the last in the existing list and find that it's already in the correct place. I expect the worst case to be where the data is
+sorted in reverse as in this case each element has to move the maximum distance.
+
+I notice that the model solution for quick sort takes the pivot from the end of the list. This means that both sorted and reverse 
+sorted data are going to be the worst case where we partition the list into 1 element (the pivot) and the rest - in the sorted case 
+the pivot will be the the largest item and in the reverse sorted case it will be the smallest. The best case will be where the items 
+are uniformally random such that half of the elements are smaller than the pivot and half are larger.
+
+If I were to  change the pivot to select the middle element then I get this best case in the sorted/reverse sorted cases. 
+
+I note here that in reality the worst case would involve very long strings that are very similar such that string comparison impacts 
+performance and the best case would be a single character duplicated N times such that string comparison is free and there's no sorting 
+required. But I'll ignore these pathalogical cases.
+
+
+>> Do you expect the constants to be the same for the best and worst cases? 
+
+It depends how we're measureing this constant. If we are modelling the worst case for insertion sort as Cn^2 in the worst case and Dn in 
+the best case then I would expect C and D to be different as the C is really the work we do inside the loop so is dependent on n.
+
+In general, the constants should be roughly tied to the number of comparisons we do so it might be reasonable to expect that we can just 
+associate a C to with each n loop. 
+
+
+>> Do you expect the average case to be closer to best or worst case? 
+
+It depends on what average is. But if we assume uniform then I expect average to be closer to worst case for insertion sort as even if we're 
+moving elements halfway through the array, that's still going to be closer to n^2 than n. The best case for quick sort is the average case of 
+uniform distribution so they should be roughly the same.
+
+------------------------
+Experimental Design
+------------------------
+
+>> What are the best and worst cases and what are their theoretical complexities? 
+
+The cases are as above.
+
+Insertion sort. Best is O(n), worst is O(n^2).
+Quick sort. Best is O(n log n), worst is O(n^2).
+
+
+>> What average case will you consider, in what way can it be considered average? 
+
+The most obvious thing to do here is to take a uniformly random shuffle as that's technically 'average'.
+
+However, it's not very realistic. For example, strings are not random in reality - there are a lot of words that start with 'e' and relatively 
+few that start with 'x'. Many words in the dictionary are similar to each other. Many applications that generate strings do so such that they 
+are 'almost' sorted.
+
+However, I'm going to consider the uniform random shuffle here as it's easy to generate and is likely to be closer to real behaviour than 
+sorted versions. 
+
+>> Which data will you use to compute f(n) for best, worst, and average cases?
+
+I'm going to generate 100k random strings and 
+
+(i) shuffle them
+(ii) sort them in dictionary order
+(iii) reverse sort them in dictionary order
+
+I hope that 100k is big enough for quick sort to show a difference, if it isn't I'll generate some more.
+
+>> How will you compute f(n) for the best, worst, and average cases? 
+
+For each case I'll run the program on dictionaries of increasing size (in 10k increments) with a single word query.
+
+I will measure the times and then try and fit the cases against the data. This is really a regression exercise but I'm not going to go to
+the effort of using proper regression methods as a 'best effort fit' is probably going to be good enough here.
+
+So I will get different constants for each case.
+
+
+>> How will you validate your findings?
+
+I will generate some similar larger data e.g. 150k, 200k and check whether the function roughly predicates the correct times.
+
+
+Note: I wrote all of the above before starting any experiments
+
+------------------------
+Results and Analysis
+------------------------
+
+>> What are your computed functions and what data did you use to compute them? 
+
+I ran the following experiment
+
+python random_strings.py > random
+sort -d random > sorted
+sort -dr random > rsorted
+sizes=( 10000 20000 30000 40000 50000 60000 70000 80000 90000 100000 )
+files=( sorted rsorted random )
+modes=( 1 2 )
+TIMEFORMAT=%R
+echo "x" > query 
+for m in "${modes[@]}"; do echo "Mode $m"; for f in "${files[@]}"; do echo "File $f"; for i in "${a[@]}"; do tail -$i $f > t; time c/speller_darray -m $m -d t x > /dev/null; rm t; done; done; done
+
+And recorded the data in this Google Spreadsheet: https://docs.google.com/spreadsheets/d/1RK1NagRmDWSQLBSwVCPlXngYZGreySLfPO4OSyznv1c/edit?usp=sharing 
+
+In this I took n to be 10k, which will lead to slightly inaccurate results. I also assumed that the only constant of interest was the one inside the loop, even though
+the constant outside the loop will play a part. For example, I could have used quadratic regression to get the values in a + bn + cn^2 for insertion sort. But did not. 
+
+Insertion sort:
+
+Best is    f(n) = 0.027n 
+Worst is   f(n) = 0.311n^2
+Average is f(n) = 0.229n^2
+
+I measured the error and it was reasonable for best and worst but increased for average such that I underestimate. 
+
+In the spreadsheet I find that a linear regression on these values for the best case would give f(n) = 0.026n + 0.0029, which is roughly what I estimated but doesn't extrapolate as well
+to the larger values. 
+
+Quick sort:
+
+Best is   f(n) = 0.000000204*(10000*n*log2(10000*A2))
+Worst is  f(n) = 0.271n^2
+
+This suggests that the worst case for quick sort isn't as bad as the worst case for insertion sort. The best case is written like this as taking the log of the abstracted n
+doesn't make a lot of sense. The errors look reasonable in general but get pretty large for the worst case.  
+ 
+
+>> Do the best and worst case use the same constants? Why do you think this is? 
+
+No. I'm just going to think about insertion sort.
+
+And I'm going to on a little adventure. Below is the disassembled C code from the model insertion sort solution.
+
+I've split this up into the basic blocks (a basic block is one that doesn't have any internal jumps) and labelled them A-E.
+
+The best case will do N(A+B+C+D+E+G)  whilst the worst case will do sum_{i=1}^N A+B+G+ i(C+D+E+F)
+
+So the worst case is running F whilst the best case is not... so there's a different amount of work to do on each loop as well as a different number of loops (which is the answer and
+you really don't need to look at the assembly to get to that answer). 
+
+A
+   0x00000001000016a0 <+0>:	push   %rbp
+   0x00000001000016a1 <+1>:	mov    %rsp,%rbp
+   0x00000001000016a4 <+4>:	sub    $0x30,%rsp
+   0x00000001000016a8 <+8>:	mov    %rdi,-0x8(%rbp)
+   0x00000001000016ac <+12>:	mov    -0x8(%rbp),%rdi
+   0x00000001000016b0 <+16>:	mov    0xc(%rdi),%eax
+   0x00000001000016b3 <+19>:	mov    %eax,-0xc(%rbp)
+   0x00000001000016b6 <+22>:	movl   $0x1,-0x10(%rbp)
+   0x00000001000016bd <+29>:	mov    -0x10(%rbp),%eax
+   0x00000001000016c0 <+32>:	cmp    -0xc(%rbp),%eax
+   0x00000001000016c3 <+35>:	jge    0x10000177e <insertion_sort+222>
+B
+   0x00000001000016c9 <+41>:	mov    -0x8(%rbp),%rax
+   0x00000001000016cd <+45>:	mov    (%rax),%rax
+   0x00000001000016d0 <+48>:	movslq -0x10(%rbp),%rcx
+   0x00000001000016d4 <+52>:	mov    (%rax,%rcx,8),%rax
+   0x00000001000016d8 <+56>:	mov    %rax,-0x20(%rbp)
+   0x00000001000016dc <+60>:	mov    -0x10(%rbp),%edx
+   0x00000001000016df <+63>:	sub    $0x1,%edx
+   0x00000001000016e2 <+66>:	mov    %edx,-0x14(%rbp)
+C
+   0x00000001000016e5 <+69>:	xor    %eax,%eax
+   0x00000001000016e7 <+71>:	mov    %al,%cl
+   0x00000001000016e9 <+73>:	cmpl   $0x0,-0x14(%rbp)
+   0x00000001000016ed <+77>:	mov    %cl,-0x21(%rbp)
+   0x00000001000016f0 <+80>:	jl     0x100001717 <insertion_sort+119>
+D
+   0x00000001000016f6 <+86>:	mov    -0x8(%rbp),%rax
+   0x00000001000016fa <+90>:	mov    (%rax),%rax
+   0x00000001000016fd <+93>:	movslq -0x14(%rbp),%rcx
+   0x0000000100001701 <+97>:	mov    (%rax,%rcx,8),%rdi
+   0x0000000100001705 <+101>:	mov    -0x20(%rbp),%rsi
+   0x0000000100001709 <+105>:	callq  0x100001120 <compare>
+   0x000000010000170e <+110>:	cmp    $0x0,%eax
+   0x0000000100001711 <+113>:	setg   %dl
+   0x0000000100001714 <+116>:	mov    %dl,-0x21(%rbp)
+E
+   0x0000000100001717 <+119>:	mov    -0x21(%rbp),%al
+   0x000000010000171a <+122>:	test   $0x1,%al
+   0x000000010000171c <+124>:	jne    0x100001727 <insertion_sort+135>
+   0x0000000100001722 <+130>:	jmpq   0x100001758 <insertion_sort+184>
+F
+   0x0000000100001727 <+135>:	mov    -0x8(%rbp),%rax
+   0x000000010000172b <+139>:	mov    (%rax),%rax
+   0x000000010000172e <+142>:	movslq -0x14(%rbp),%rcx
+   0x0000000100001732 <+146>:	mov    (%rax,%rcx,8),%rax
+   0x0000000100001736 <+150>:	mov    -0x8(%rbp),%rcx
+   0x000000010000173a <+154>:	mov    (%rcx),%rcx
+   0x000000010000173d <+157>:	mov    -0x14(%rbp),%edx
+   0x0000000100001740 <+160>:	add    $0x1,%edx
+   0x0000000100001743 <+163>:	movslq %edx,%rsi
+   0x0000000100001746 <+166>:	mov    %rax,(%rcx,%rsi,8)
+   0x000000010000174a <+170>:	mov    -0x14(%rbp),%edx
+   0x000000010000174d <+173>:	sub    $0x1,%edx
+   0x0000000100001750 <+176>:	mov    %edx,-0x14(%rbp)
+   0x0000000100001753 <+179>:	jmpq   0x1000016e5 <insertion_sort+69>
+G
+   0x0000000100001758 <+184>:	mov    -0x20(%rbp),%rax
+   0x000000010000175c <+188>:	mov    -0x8(%rbp),%rcx
+   0x0000000100001760 <+192>:	mov    (%rcx),%rcx
+
+
+>> Is the average case closer to the best or worst case? Why do you think this is?
+
+As predicted, for insertion sort the average was close to worse. For quick sort the average and best are the same.
+
+========================================================================================
+Experiment 2
+========================================================================================
+
+------------------------
+Initial Expectations
+------------------------
+
+>> Do you expect sorting + binary search to beat linear search on all inputs, most inputs, some inputs? Why? 
+
+I expect sorting + binary search to bear linear search when there are enough queries to make sorting worthwhile.
+
+If there is just one query then we can do linear search in O(n), which is better than O(nlogn + log n). 
+
+
+>> Do you expect your answer to change for different sorting algorithms? Why?
+
+For quick sort the cost of sorting is much lower and we would need a really big (or poorly structured) dictionary to see
+the impact of sorting.
+
+
+>> Do you expect your answer to change if the dictionary is in the best/worst case for sorting? Why?
+
+Yes, it's all about whether the price is worth paying. So how much we need to pay for sorting is going to change the point
+at which we see a difference. 
+
+If the best case is O(n) as it is with insertion sort then this is unlikely to be a cost we're not happy to pay as its similar
+to linear sort.
+
+
+>> Do you expect your answer to change based on the number of succesful queries? Why? 
+
+This is now about the expected cost of queries. If it is its worst case then we can beat linear search more easily. But if we have an
+average n/2 for linear search then we're going to take a bit longer to pay for the cost of sorting.
+
+
+>> Can you phrase what you expect in terms of a one or two sentence hypothesis that you can test?
+
+As we increase the number of queries the time taken will increase linearly for linear search but it will increase much more slowly for sorting + binary search
+(it will be some constant + logarithmic growth) to the point where sorting + binary search will be faster.
+
+In this hypothesis I have chosen to fix the dictionary size and the structure of dictionary. We could reasonably also pose other hypotheses that changed other things
+and proposed how performance would change.
+
+------------------------
+Experimental Design
+------------------------
+
+>> What are the theoretical best/worst cases of searching and sorting methods involved? 
+
+Worst case:
+Linear search is O(n)
+Insertion sort is O(n^2)
+Binary search is O(log n)
+
+Best case:
+Linear search is O(1)
+Insertion sort is O(n)
+Binary search is O(1)
+
+But if we assume distinct queries we would not expect constant best search time for all of them - they cannot all be at the front.
+
+Searching for k queries in a dictionary of size n is
+
+Worst case:
+Linear search O(nk)
+Binary Search O(klogn)
+
+Best case:
+Linear search O(k(k-1)/2) = O(k^2) - they are the first k elements
+Binary Search O(klogk) - they are evenly distributed in the top k slots of the tree 
+
+I'm not sure how relevant this is here but interesting to note, perhaps.
+
+>> Which conditions will you vary in your experiment? 
+
+Just the number of queries as this is the most interesting factor.
+
+
+>> How will you vary them? Why did you make these choices? Did you use the theoretical complexities to inform your decisions?
+
+The simple answer is that I will vary sizes over a sensible range and then interpolate around an inflection point to focus in on where the change happens.
+
+But we can try and look at the theory to see what's sensible
+
+I can characterise things as
+
+nk > cost_of_sorting + klogn
+
+for k queries and a dictionary of size n. E.g. when does linear search get more expensive.
+
+In general I expect logn to be neglibile e.g. logn is 16 for n=100000.
+
+So we could rewrite this as follows when n is expected to be very big
+
+nk > cost_of_sorting + k
+
+For the worst case for both insertion and quick sort we would have
+
+nk > n*n + k
+
+and we need k to be > n+1 so the crossover is going to be in the order of  n=k assuming the constant factors are the same on either side.
+But this is unlikely. What I can do is use n as a rough guide e.g. explore values of k up to n.
+
+If we look at the average case for quick sort we have
+
+nk > (n+k)logn
+
+If we let k=1 then this is roughly
+
+n > nlogn
+
+which is only going to be true based on the constants. So I would expect the inflection point to occur only for very large n and very
+small k.
+
+>> How will you generate the data for your experiments? 
+
+To explore the worst case I'm going to do
+
+sh generate.sh random dict query 100000 100000 reverse 0
+
+for a randomly generated set of 200k words.
+
+For the best case I'll generate 2 million random strings and use a very small set of queries. For insertion sort I'll sort them
+and for quick sort I'll leave them random.
+
+------------------------
+Results and Analysis
+------------------------
+
+>> What results did you record?
+
+Most results are given in the same google spreadsheet.
+
+Firstly I looked at insertion sort worst case. 
+For n=100,000 the crossover point was around 55,000. I repeated the experiment for n=50,000 and the crossover was around 28,500.
+
+I also validated my assumption about insertion sort best case. For random sorted dictionaries of 1 and 2 million strings, both
+linear search and insertion sort + binary search took roughly the same amount of time with very small query files. For larger
+query files sorting (obviously) helps a lot.
+
+For quick sort best case for n of 1 and 2 million the crossover point was around 160 (a bit below then a bit above). 
+For n=100k the crossover point was closer to 64. So a 10x increase in dictionary size moves the crossover point ~2x.
+
+>> What does this tell you about the relationship between linear search and sorting + binary search?
+
+That we have to have quite a lot of queries to make the sorting worthwhile if we are in the worst case for sorting but that if we
+are in the best case we should probably sort.
+
+>> What is the answer to the question "Under what conditions is it better to perform linear search rather than binary search?"
+
+If your dictionary is reverse sorted and you are using insertion sort then the number of queries should be just a bit fewer than half the size of the dictionary.
+
+If your dictionary is in a best case setting then you should only have a very small number of queries. 
+
+I haven't strongly validated this result but this is what I extrapolate from the data.
