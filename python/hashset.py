@@ -12,6 +12,8 @@ class hashset:
         self.conflicts = 0
         self.no_inserts = 0
         self.re_hashes = 0
+        self.duplicates = 0
+        self.dict_size = 0
 
         self.hash_table = [] # Hash table which will become a list of cells/chains
 
@@ -45,76 +47,81 @@ class hashset:
 
     def insert(self, value):
         # TODO code for inserting into  hash table
-        if HashingModes(self.mode) == HashingModes.HASH_1_LINEAR_PROBING or HashingModes(self.mode) == HashingModes.HASH_2_LINEAR_PROBING:
-            # -- INSERT LINEAR PROBING --
-            location = self.hash(value)
-            location_initial = location
-            iterator = 1
-            if self.hash_table[location].current_state == state.in_use:
-                self.conflicts = self.conflicts + 1
-            while self.hash_table[location].current_state == state.in_use:
-                location = (location_initial + iterator) % self.hash_table_size
-                iterator = (iterator + 1) % self.hash_table_size
-                if self.load_factor() > 0.75 or location_initial == location:
-                    self.re_hash(self.nextPrime(self.hash_table_size * 3))
-                    location = self.hash(value)
-                    location_initial = location
-                    iterator = 1
-            self.hash_table[location] = cell(value, 1)
-            # -- INSERT LINEAR PROBING --
+        if not self.find(value) or self.no_inserts == 0:
+            if HashingModes(self.mode) == HashingModes.HASH_1_LINEAR_PROBING or HashingModes(self.mode) == HashingModes.HASH_2_LINEAR_PROBING:
+                # -- INSERT LINEAR PROBING --
+                location = self.hash(value)
+                location_initial = location
+                iterator = 1
+                if self.hash_table[location].current_state == state.in_use:
+                    self.conflicts = self.conflicts + 1
+                while self.hash_table[location].current_state == state.in_use:
+                    location = (location_initial + iterator) % self.hash_table_size
+                    iterator = (iterator + 1) % self.hash_table_size
+                    if self.load_factor() > 0.75 or location_initial == location:
+                        self.re_hash(self.nextPrime(self.hash_table_size * 3))
+                        location = self.hash(value)
+                        location_initial = location
+                        iterator = 1
+                self.hash_table[location] = cell(value, 1)
+                # -- INSERT LINEAR PROBING --
 
-        elif HashingModes(self.mode) == HashingModes.HASH_1_QUADRATIC_PROBING or HashingModes(self.mode) == HashingModes.HASH_2_QUADRATIC_PROBING:
-            # -- INSERT QUADRATIC PROBING --
-            location = self.hash(value)
-            location_initial = location
-            iterator = 1
-            if self.hash_table[location].current_state == state.in_use:
-                self.conflicts = self.conflicts + 1
-            while self.hash_table[location].current_state == state.in_use:
-                location = (location_initial + (iterator ** 2)) % self.hash_table_size
-                iterator = (iterator + 1) % self.hash_table_size
-                if self.load_factor() > 0.75 or location_initial == location:
-                    self.re_hash(self.nextPrime(self.hash_table_size * 3))
-                    location = self.hash(value)
-                    location_initial = location
-                    iterator = 1
-            self.hash_table[location] = cell(value, 1)
-            # -- INSERT QUADRATIC PROBING --
+            elif HashingModes(self.mode) == HashingModes.HASH_1_QUADRATIC_PROBING or HashingModes(self.mode) == HashingModes.HASH_2_QUADRATIC_PROBING:
+                # -- INSERT QUADRATIC PROBING --
+                location = self.hash(value)
+                location_initial = location
+                iterator = 1
+                if self.hash_table[location].current_state == state.in_use:
+                    self.conflicts = self.conflicts + 1
+                while self.hash_table[location].current_state == state.in_use:
+                    location = (location_initial + (iterator ** 2)) % self.hash_table_size
+                    iterator = (iterator + 1) % self.hash_table_size
+                    if self.load_factor() > 0.75 or location_initial == location:
+                        self.re_hash(self.nextPrime(self.hash_table_size * 3))
+                        location = self.hash(value)
+                        location_initial = location
+                        iterator = 1
+                self.hash_table[location] = cell(value, 1)
+                # -- INSERT QUADRATIC PROBING --
 
-        elif HashingModes(self.mode) == HashingModes.HASH_1_DOUBLE_HASHING or HashingModes(self.mode) == HashingModes.HASH_2_DOUBLE_HASHING:
-            # -- INSERT DOUBLE HASHING --
-            location = self.hash(value)
-            location_initial = location
-            location_otherhash = self.other_hash(value)
-            iterator = 1
-            if self.hash_table[location].current_state == state.in_use:
-                self.conflicts = self.conflicts + 1
-            while self.hash_table[location].current_state == state.in_use:
-                location = (location_initial + (iterator * location_otherhash)) % self.hash_table_size
-                iterator = (iterator + 1) % self.hash_table_size
-                if self.load_factor() > 0.75 or location_initial == location:
-                    self.re_hash(self.nextPrime(self.hash_table_size * 3))
-                    location = self.hash(value)
-                    location_initial = location
-                    location_otherhash = self.other_hash(value)
-                    iterator = 1
-            self.hash_table[location] = cell(value, 1)
-            # -- INSERT DOUBLE HASHING --
+            elif HashingModes(self.mode) == HashingModes.HASH_1_DOUBLE_HASHING or HashingModes(self.mode) == HashingModes.HASH_2_DOUBLE_HASHING:
+                # -- INSERT DOUBLE HASHING --
+                location = self.hash(value)
+                location_initial = location
+                location_otherhash = self.other_hash(value)
+                iterator = 1
+                if self.hash_table[location].current_state == state.in_use:
+                    self.conflicts = self.conflicts + 1
+                while self.hash_table[location].current_state == state.in_use:
+                    location = (location_initial + (iterator * location_otherhash)) % self.hash_table_size
+                    iterator = (iterator + 1) % self.hash_table_size
+                    if self.load_factor() > 0.75 or location_initial == location:
+                        self.re_hash(self.nextPrime(self.hash_table_size * 3))
+                        location = self.hash(value)
+                        location_initial = location
+                        location_otherhash = self.other_hash(value)
+                        iterator = 1
+                self.hash_table[location] = cell(value, 1)
+                # -- INSERT DOUBLE HASHING --
 
-        elif HashingModes(self.mode) == HashingModes.HASH_1_SEPARATE_CHAINING or HashingModes(self.mode) == HashingModes.HASH_2_SEPARATE_CHAINING:
-            # -- INSERT SEPARATE CHAINING --
-            location = self.hash(value)
-            self.hash_table[location].elements.append(value)
-            if len(self.hash_table[location].elements) >= 2:
-                self.conflicts = self.conflicts + 1
-            if (self.load_factor() > 5):
-                self.re_hash(self.nextPrime(self.hash_table_size * 5))
-            # -- INSERT SEPARATE CHAINING --
+            elif HashingModes(self.mode) == HashingModes.HASH_1_SEPARATE_CHAINING or HashingModes(self.mode) == HashingModes.HASH_2_SEPARATE_CHAINING:
+                # -- INSERT SEPARATE CHAINING --
+                location = self.hash(value)
+                self.hash_table[location].elements.append(value)
+                if len(self.hash_table[location].elements) >= 2:
+                    self.conflicts = self.conflicts + 1
+                if (self.load_factor() > 5):
+                    self.re_hash(self.nextPrime(self.hash_table_size * 5))
+                # -- INSERT SEPARATE CHAINING --
 
+            else:
+                print("Can not determine Probing Mode")
+                exit()
+            self.no_inserts = self.no_inserts + 1
+            self.dict_size = self.dict_size + 1
         else:
-            print("Can not determine Probing Mode")
-            exit()
-        self.no_inserts = self.no_inserts + 1
+            self.duplicates = self.duplicates + 1
+            self.dict_size = self.dict_size + 1
 
     def find(self, value):
         # TODO code for looking up in hash table
@@ -123,7 +130,7 @@ class hashset:
             location = self.hash(value)
             location_initial = location
             iterator = 1
-            while location < len(self.hash_table) and not self.hash_table[location].current_state == state.empty:
+            while not self.hash_table[location].current_state == state.empty:
                 if self.hash_table[location].element == value:
                     return True
                 location = (location_initial + iterator) % self.hash_table_size
@@ -136,7 +143,7 @@ class hashset:
             location = self.hash(value)
             location_initial = location
             iterator = 1
-            while location < len(self.hash_table) and not self.hash_table[location].current_state == state.empty:
+            while not self.hash_table[location].current_state == state.empty:
                 if self.hash_table[location].element == value:
                     return True
                 location = (location_initial + (iterator ** 2)) % self.hash_table_size
@@ -150,11 +157,11 @@ class hashset:
             location_initial = location
             location_otherhash = self.other_hash(value)
             iterator = 1
-            while location < len(self.hash_table) and not self.hash_table[location].current_state == state.empty:
+            while not self.hash_table[location].current_state == state.empty:
                 if self.hash_table[location].element == value:
                     return True
                 location = (location_initial + (iterator * location_otherhash)) % self.hash_table_size
-                iterator = (iterator + 1) %self.hash_table_size
+                iterator = (iterator + 1) % self.hash_table_size
             return False
             # -- FIND DOUBLE HASHING --
 
@@ -211,6 +218,7 @@ class hashset:
         conflicts_current = self.conflicts
         no_inserts_current = self.no_inserts
         table_current = self.hash_table
+        current_dict_size = self.dict_size
         
         self.hash_table = []
 
@@ -236,6 +244,7 @@ class hashset:
         # Re assign the correct values
         self.conflicts = conflicts_current
         self.no_inserts = no_inserts_current
+        self.dict_size = current_dict_size
         self.re_hashes = self.re_hashes + 1
 
     def load_factor(self):
@@ -270,7 +279,9 @@ class hashset:
         # Code for printing statistics and debugging info
         print("Probing and hashing mode: " + str(HashingModes(self.mode)))
         print("Length of hast table: " + str(self.hash_table_size))
+        print("Size of dictionary: " + str(self.dict_size))
         print("Number of inserts: " + str(self.no_inserts))
+        print("Duplicates: " + str(self.duplicates))
         print("Conflicts: " + str(self.conflicts))
         print("Collision average: " + str(int(self.conflicts / self.no_inserts * 100)) + "%")
         print("Load factor of the hash table: " + str(self.load_factor()))
