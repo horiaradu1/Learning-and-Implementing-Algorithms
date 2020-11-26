@@ -6,8 +6,6 @@ class darray:
     def __init__(self):
         self.array = []
         self.sorted = False
-        self.mode = config.mode
-        self.verbose = config.verbose
         
     def insert(self, string):
         self.array.append(string)
@@ -16,20 +14,34 @@ class darray:
         self.sorted = False
         
     def find(self, value):
-        if (self.mode == SearchModes.LINEAR_SEARCH.value):
-            # TODO implement linear search through list
-            print("Linear search not yet implemented")
+        if (config.mode == SearchModes.LINEAR_SEARCH.value):
+            for string in self.array:
+                if (value == string):
+                    return True
+            return False
         else:
             if (not self.sorted):
-                if (self.verbose > 0):
+                if (config.verbose > 0):
                     print("Dynamic Array not sorted, sorting... \n")
                     
-                self.sort(self.mode)
-                if (self.verbose > 0):
+                self.sort(config.mode)
+                if (config.verbose > 0):
                     print("Dynamic Array sorted\n")
                 
                 self.sorted = True
-            # TODO implement binary search through array
+            first = 0
+            last = len(self.array) - 1
+            middle = int((first + last)/2)
+            
+            while (first <= last):
+                if (self.array[middle] < value):
+                    first = middle + 1
+                elif (self.array[middle] == value):
+                    return True
+                else:
+                    last = middle - 1
+                middle = int((first + last)/2)
+                
         return False
         
     def print_set(self):
@@ -64,13 +76,41 @@ class darray:
         self.array[b] = temp
         
     def insertion_sort(self):
-        sys.stderr.write("Not implemented\n")
-        sys.exit(-1)
+        n = len(self.array)
+        for i in range(n):
+            key = self.array[i]
+            j = i - 1
+            while (j >= 0 and self.array[j] > key):
+                self.array[j + 1] = self.array[j]
+                j = j - 1
+            self.array[j + 1] = key
+            
         
-    # Hint: you probably want to define a help function for the recursive call    
+    # Hint: you probably want to define a help function for the recursive call
+    def quick_sort_recursive(self, start, end):
+        if (start >= end):
+            return
+        mid = self.array[end]
+        left = start
+        right = end - 1
+        while (left < right):
+            while (self.array[left] < mid and left < right):
+                left = left + 1
+            while (self.array[right] >= mid and left < right):
+                right = right - 1
+            self.swap(left, right)
+            
+        if (self.array[left] >= self.array[end]):
+            self.swap(left, end)
+        else:
+            left = left + 1
+        
+        if (left > 0):
+            self.quick_sort_recursive(start, left - 1)
+        self.quick_sort_recursive(left + 1, end)
+    
     def quick_sort(self):
-        sys.stderr.write("Not implemented\n")
-        sys.exit(-1)
+        self.quick_sort_recursive(0, len(self.array) - 1)
 
             
     
