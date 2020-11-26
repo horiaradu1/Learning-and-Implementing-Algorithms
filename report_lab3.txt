@@ -117,9 +117,9 @@ I have changed the random dict and infile to be of 500000 length, with 250000
 sudo bash generate.sh experiment/dict_strings experiment/random/dict experiment/random/infile 500000 250000 random 100
 
 Random:
-    Darray = 10.6 seconds
-    Hashset = 40.5 seconds with hash table size being 507
-    Hashset = 21.1 seconds with hash table size being 750137, thus no rehashing needed
+    Darray = 13.6 seconds
+    Hashset = 50.5 seconds with hash table size being 507
+    Hashset = 31.1 seconds with hash table size being 750137, thus no rehashing needed
     Bstree = 21.5 seconds
 
 After this, I can conclude that both Dynamic Array and Hashset data structures can be considered preferable, depending on some conditions.

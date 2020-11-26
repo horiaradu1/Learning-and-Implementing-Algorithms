@@ -47,17 +47,23 @@ class hashset:
 
     def insert(self, value):
         # TODO code for inserting into  hash table
+        # Change load factor and hash table size multiplication for different outcomes
+        # First check if the value is a duplicate, and if it is, skip the insert and add it to the statistics
         if not self.find(value) or self.no_inserts == 0:
+            # Chech to see what mode to go in
             if HashingModes(self.mode) == HashingModes.HASH_1_LINEAR_PROBING or HashingModes(self.mode) == HashingModes.HASH_2_LINEAR_PROBING:
                 # -- INSERT LINEAR PROBING --
                 location = self.hash(value)
                 location_initial = location
                 iterator = 1
+                # Check to see if the initial location is already in use
                 if self.hash_table[location].current_state == state.in_use:
                     self.conflicts = self.conflicts + 1
+                # Main while loop for probing
                 while self.hash_table[location].current_state == state.in_use:
                     location = (location_initial + iterator) % self.hash_table_size
                     iterator = (iterator + 1) % self.hash_table_size
+                    # If function to check if it should rehash
                     if self.load_factor() > 0.75 or location_initial == location:
                         self.re_hash(self.nextPrime(self.hash_table_size * 3))
                         location = self.hash(value)
@@ -71,11 +77,14 @@ class hashset:
                 location = self.hash(value)
                 location_initial = location
                 iterator = 1
+                # Check to see if the initial location is already in use
                 if self.hash_table[location].current_state == state.in_use:
                     self.conflicts = self.conflicts + 1
+                # Main while loop for probing
                 while self.hash_table[location].current_state == state.in_use:
                     location = (location_initial + (iterator ** 2)) % self.hash_table_size
                     iterator = (iterator + 1) % self.hash_table_size
+                    # If function to check if it should rehash
                     if self.load_factor() > 0.75 or location_initial == location:
                         self.re_hash(self.nextPrime(self.hash_table_size * 3))
                         location = self.hash(value)
@@ -90,13 +99,16 @@ class hashset:
                 location_initial = location
                 location_otherhash = self.other_hash(value)
                 iterator = 1
+                # Check to see if the initial location is already in use
                 if self.hash_table[location].current_state == state.in_use:
                     self.conflicts = self.conflicts + 1
+                # Main while loop for probing
                 while self.hash_table[location].current_state == state.in_use:
                     location = (location_initial + (iterator * location_otherhash)) % self.hash_table_size
                     iterator = (iterator + 1) % self.hash_table_size
-                    if self.load_factor() > 0.75 or location_initial == location:
-                        self.re_hash(self.nextPrime(self.hash_table_size * 3))
+                    # If function to check if it should rehash
+                    if self.load_factor() > 0.5 or location_initial == location:
+                        self.re_hash(self.nextPrime(self.hash_table_size * 2))
                         location = self.hash(value)
                         location_initial = location
                         location_otherhash = self.other_hash(value)
@@ -108,8 +120,10 @@ class hashset:
                 # -- INSERT SEPARATE CHAINING --
                 location = self.hash(value)
                 self.hash_table[location].elements.append(value)
+                # If the chain cell already has 1 element, count it as a conflict
                 if len(self.hash_table[location].elements) >= 2:
                     self.conflicts = self.conflicts + 1
+                # Rehash the table if its load factor is bigger than 5
                 if (self.load_factor() > 5):
                     self.re_hash(self.nextPrime(self.hash_table_size * 5))
                 # -- INSERT SEPARATE CHAINING --
@@ -125,11 +139,13 @@ class hashset:
 
     def find(self, value):
         # TODO code for looking up in hash table
+        # Same as insert, check to see which mode to use
         if HashingModes(self.mode) == HashingModes.HASH_1_LINEAR_PROBING or HashingModes(self.mode) == HashingModes.HASH_2_LINEAR_PROBING:
             # -- FIND LINEAR PROBING --
             location = self.hash(value)
             location_initial = location
             iterator = 1
+            # Main while loop that looks for the value
             while not self.hash_table[location].current_state == state.empty:
                 if self.hash_table[location].element == value:
                     return True
@@ -143,6 +159,7 @@ class hashset:
             location = self.hash(value)
             location_initial = location
             iterator = 1
+            # Main while loop that looks for the value
             while not self.hash_table[location].current_state == state.empty:
                 if self.hash_table[location].element == value:
                     return True
@@ -157,9 +174,13 @@ class hashset:
             location_initial = location
             location_otherhash = self.other_hash(value)
             iterator = 1
+            # Main while loop that looks for the value
             while not self.hash_table[location].current_state == state.empty:
                 if self.hash_table[location].element == value:
                     return True
+                # Added this so that the Double Hashing does not go in an infinite loop
+                if location_otherhash == 0:
+                    location_otherhash = 1
                 location = (location_initial + (iterator * location_otherhash)) % self.hash_table_size
                 iterator = (iterator + 1) % self.hash_table_size
             return False
@@ -169,6 +190,7 @@ class hashset:
             # -- FIND SEPARATE CHAINING --
             location = self.hash(value)
             iterator = 0
+            # Main while loop that looks for the value
             while iterator < len(self.hash_table[location].elements):
                 if self.hash_table[location].elements[iterator] == value:
                     return True
