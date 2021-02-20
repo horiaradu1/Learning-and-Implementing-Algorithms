@@ -9,11 +9,11 @@ public class ap {
     }
 
     private static char[] code_string_to_code(String code_string) {
-	char [] code = new char[4];
+	char [] code = new char[3];
 	for (int i = 0; i < 3; i++) {
 	    code[i] = code_string.charAt(i);
 	}
-	code[3] = 0;
+	// code[3] = 0;
 	return code;
     }
     
@@ -61,7 +61,7 @@ public class ap {
 	System.out.format("Total = %dkm\n",17016);
 
 	/// If there is no route ...
-	System.out.format("No route from %s to %s\n",scode,dcode);
+	System.out.format("No route from %s to %s\n",scode_string,dcode_string);
 
 	/// And, in any case, log the number of relaxed/explored edges
 	System.out.format("LOG: relaxed %d edges\n\n", 1896);
@@ -74,9 +74,9 @@ public class ap {
         ap ap = new ap(general_settings);
         ap.airport_info.ap_std_init();
 
-	if (args.length == 5 && args[0].equals("route")) {
+	if (args.length == 4 && args[0].equals("route")) {
 	    ap.compute_route(args[1],args[2],args[3]);
-	} else if (args.length == 3 && args[0].equals("count")) {
+	} else if (args.length == 2 && args[0].equals("count")) {
 	    ap.count_reachable(args[1]);
 	} else {
 	    sp_algorithms.error("Invalid command line");
