@@ -11,33 +11,18 @@
 #include "pq.h"
 
 
-/**
- * Implement the interface given in pq.h.
- *
- * We make a few proposals here, but you are welcome to deviate from that, as long as you
- * correctly implement the interface with the specified worst-case complexities!
- *
- */
-
-
-
-/**
- * First, we propose a 1-based indexing into the heap, using 0 as "invalid index".
- *
- * Wrapping a heap-index into a structure prevents its accidental confusion with element indexes (Which might save you from a lot of hard-to-find bugs!).
- *
- */
-
 typedef struct {size_t i;} hidx_t;
 
+size_t idx_of(hidx_t i) {return i.i - 1;}
 
 const hidx_t INVALID_HIDX = {0};
-const hidx_t hidx_first = {1};
-
-size_t idx_of(hidx_t i) {return i.i - 1;} /// Convert to zero-based index
 bool hidx_is_invalid(hidx_t i) {return i.i == 0;}
 
-// Index operations
+const hidx_t hidx_first = {1};
+
+
+
+// 1-based operations
 hidx_t parent(hidx_t i) {return (hidx_t){i.i / 2}; }
 hidx_t left(hidx_t i) {return (hidx_t){i.i * 2}; }
 hidx_t right(hidx_t i) {return (hidx_t){i.i * 2 + 1}; }
@@ -45,15 +30,9 @@ bool has_parent(hidx_t i) {return parent(i).i>0; }
 bool has_left(size_t n, hidx_t i) {return left(i).i<=n; }
 bool has_right(size_t n, hidx_t i) {return right(i).i<=n; }
 
-/**
- * The priority queue has 3 main components:
- *   1. An array D that maps nodes to priorities. It is independent from the content of the actual queue.
- *   2. An array H of nodes that encodes the heap of size heap_size.
- *   3. An array I, that maps each node to its current index in H. If a node u is not in the queue, we set H[u] = INVALID_HIDX.
- *
- */
+
 struct _DPQ_t {
-    size_t N;     // Number of elements
+    size_t num_elem;     // Number of elements
     size_t heap_size;    // Current size of heap
     weight_t *D;  // Priorities
     node_t *H;    // The heap
@@ -61,92 +40,140 @@ struct _DPQ_t {
 };
 
 
-DPQ_t *DPQ_new(size_t N) {
-    // Initialize the structure. Allocate enough space for all arrays to hold N elements.
-    return NULL;
+void DPQ_init(DPQ_t *pq, size_t num_elem) {
+    pq->num_elem = num_elem;
+    pq->heap_size=0;
+    pq->D = CALLOC(weight_t,num_elem);
+    pq->H = CALLOC(node_t,num_elem);
+    pq->I = CALLOC(hidx_t,num_elem);
+
+    for (size_t i=0;i<num_elem;++i) {
+      pq->I[i]=INVALID_HIDX;
+      pq->D[i]=weight_inf();
+    }
+
+}
+
+void DPQ_uninit(DPQ_t *pq) {
+    free(pq->D);
+    free(pq->H);
+    free(pq->I);
+}
+
+DPQ_t *DPQ_new(size_t num_elem) {
+    DPQ_t *pq = CALLOC(DPQ_t,1);
+    DPQ_init(pq,num_elem);
+    return pq;
 }
 
 void DPQ_delete(DPQ_t *pq) {
-    // Free everything in pq
-
-    // and pq itself
+    DPQ_uninit(pq);
     free(pq);
 }
 
 weight_t *DPQ_dist_free(DPQ_t *pq) {
   weight_t *res=pq->D;
-
-  // Free everything but the D-array, which is returned
-
-  // ...
-
+  free(pq->H);
+  free(pq->I);
   free(pq);
   return res;
 }
 
 
 weight_t DPQ_prio(DPQ_t const *pq, node_t u) {
-  // Its a good idea to use assertions to ensure the preconditions!
-  // This makes programs more likely to fail close to the reason of the error, rarher than later, when the (indirect) consequences become apparent.
-  assert(u<pq->N);
-
-  return weight_inf(); /// *** return priority of node u
+    assert(u<pq->num_elem);
+    return pq->D[u];
 }
 
-/**
- * It is a good idea to wrap repetitive patterns into an own function (though, in C, it can be a pain).
- * This reduces the redundancy, and the chance of accidentally getting one of the repeated versions wrong.
- *
- * In this case, we get the priority associated with a heap index.
- */
 weight_t _DPQ_hprio(DPQ_t const *pq, hidx_t i) {
     return DPQ_prio(pq,pq->H[idx_of(i)]);
 }
 
+void _DPQ_adjustI(DPQ_t *pq, hidx_t i) {
+    pq->I[pq->H[idx_of(i)]] = i;
+}
 
 void _DPQ_swap(DPQ_t *pq, hidx_t i, hidx_t j) {
-  // Don't forget to update the I array!
+    node_t t = pq->H[idx_of(i)];
+    pq->H[idx_of(i)] = pq->H[idx_of(j)];
+    pq->H[idx_of(j)] = t;
+    _DPQ_adjustI(pq,i);
+    _DPQ_adjustI(pq,j);
 }
 
 
 void _DPQ_sift_up(DPQ_t *pq, hidx_t i) {
-
+    while (has_parent(i) && weight_less(_DPQ_hprio(pq,i), _DPQ_hprio(pq,parent(i)))) {
+        _DPQ_swap(pq,i,parent(i));
+        i = parent(i);
+    }
 }
 
 void _DPQ_sift_down(DPQ_t *pq, hidx_t i) {
+    while (has_right(pq->heap_size,i)) {
+        weight_t w = _DPQ_hprio(pq,i);
+        weight_t lw = _DPQ_hprio(pq,left(i));
+        weight_t rw = _DPQ_hprio(pq,right(i));
 
-  // Don't forget to handle the case that you end up at an index that has a left, but no right child!
+        if (!weight_less(lw, w) && !weight_less(rw, w)) return;
+
+        if (weight_less(lw,rw)) {
+            _DPQ_swap(pq,i,left(i));
+            i=left(i);
+        } else {
+            _DPQ_swap(pq,i,right(i));
+            i=right(i);
+        }
+    }
+
+    if (has_left(pq->heap_size,i)) {
+        weight_t w = _DPQ_hprio(pq,i);
+        weight_t lw = _DPQ_hprio(pq,left(i));
+        if (weight_less(lw,w)) _DPQ_swap(pq,i,left(i));
+    }
 
 }
 
 bool DPQ_contains(DPQ_t const *pq, node_t u) {
-    assert(u<pq->N);
-
-    return false; // Use I to check if node is on heap
+    assert(u<pq->num_elem);
+    return !hidx_is_invalid(pq->I[u]);
 }
 
+hidx_t _DPQ_last_idx(DPQ_t const *pq) {
+    return (hidx_t){pq->heap_size};
+}
 
 void DPQ_insert(DPQ_t *pq, node_t u, weight_t w) {
-  // Insert at end, then sift up
-
-  // Don't forget to update I!
+    assert(u<pq->num_elem);
+    assert(!DPQ_contains(pq,u));
+    pq->D[u]=w;
+    ++pq->heap_size;
+    hidx_t i = _DPQ_last_idx(pq);
+    pq->H[idx_of(i)]=u;
+    _DPQ_adjustI(pq,i);
+    _DPQ_sift_up(pq,i);
 }
 
 bool DPQ_is_empty(DPQ_t const *pq) {return pq->heap_size==0;}
 
 node_t DPQ_pop_min(DPQ_t *pq) {
-  assert(pq->heap_size>0);
-  // Swap first with last element, decrement heap size, then sift down
-
-  // Don't forget to update I!
-
-  return INVALID_NODE; // Return the node that was removed
+    assert(!DPQ_is_empty(pq));
+    hidx_t li = _DPQ_last_idx(pq);
+    _DPQ_swap(pq,hidx_first,li);
+    node_t res = pq->H[idx_of(li)];
+    --pq->heap_size;
+    pq->I[res] = INVALID_HIDX;
+    _DPQ_sift_down(pq,hidx_first);
+    return res;
 }
 
 void DPQ_decrease_key(DPQ_t *pq, node_t u, weight_t w) {
-  assert(u<pq->N);
-  assert(DPQ_contains(pq,u));
-  assert(weight_less(w, pq->D[u]));
+    assert(u<pq->num_elem);
+    assert(DPQ_contains(pq,u));
+    assert(weight_less(w, pq->D[u]));
+    pq->D[u]=w;
 
-  // Update priority, then sift up. Use I to find element's index on the heap
+    hidx_t i = pq->I[u];
+    _DPQ_sift_up(pq,i);
+
 }
