@@ -335,7 +335,7 @@ def check_sssp_result(g, src, r):
                 assert(pu == src) # Special case: pred of source points to itself
             else:
                 ew = w[pu][u]
-                assert (ew.weight_is_finite()), "Pred over non-edge: %d -> %d -> %d (w=%d)" %(pu, u, w[pu][u].w)
+                assert (ew.weight_is_finite()), "Pred over non-edge: %d -> %d (w=%d)" %(pu, u, w[pu][u].w)
                 rd = weight.weight_add(r.dist[pu], ew) # Relax distance for node u
                 
                 assert(weight.weight_eq(rd, r.dist[u])) # Estimates for edges on shortest path must be precise
@@ -347,7 +347,7 @@ def check_sssp_result(g, src, r):
             ew = w[pu][u]
             assert(pu < N)
             
-            assert (ew.weight_is_finite()), "Pred over non-edge: %d -> %d -> %d (w=%d)" %(pu, u, w[pu][u].w)
+            assert (ew.weight_is_finite()), "Pred over non-edge: %d -> %d (w=%d)" %(pu, u, w[pu][u].w)
             
             # Follow the cycle
             # Take N steps to make sure we are actually on the cycle
