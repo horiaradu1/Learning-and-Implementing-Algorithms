@@ -177,7 +177,7 @@ def test_hashmap(mode):
         if (not m.hashmap_contains(keys[i])):
             print("CONTAINS-KEY: %s" % keys[i])
             m.hashmap_print_set()
-            assert(False)
+            assert(false)
     
     assert(m.hashmap_get_size() == N)
     
