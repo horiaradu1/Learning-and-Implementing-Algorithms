@@ -91,7 +91,7 @@ class hashmap_t:
 
     def hashmap_insert(self, key, value):
         if self.hashmap_contains(key):
-            general.error("Duplicate key %s", key) # detect duplicate
+            general.error("Duplicate key %s" % key) # detect duplicate
             
         N = self.size
         if (self.num_entries >= N or (self.isQuadraticProbing(self.mode) and self.num_entries >= N/2)):
