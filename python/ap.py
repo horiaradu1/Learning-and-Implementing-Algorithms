@@ -9,6 +9,7 @@ from shortest_path import sssp_result_t, sp_result_t
 import graph
 import weight
 from math import sqrt
+import random
 
 def msg0(s):
     general.msg(0, s)
@@ -47,26 +48,29 @@ def compute_route(algo, scode, dcode):
     #
 
     def heuristic(g, d):
-        
-        class heuristic_path:
-            def __init__(self, u, v):
-                self.u = u
-                self.v = v
+
+        class point_t:
+            def __init__(self, x, y):
+                self.x = x
+                self.y = y
+
+        def coords_dist(coords, u, v):
+            dx = coords[u].x - coords[v].x
+            dy = coords[u].y - coords[v].y
+    
+            return weight.weight_t(round(sqrt(dx*dx + dy*dy)))
 
         N = g.graph_get_num_nodes()
         h = [weight.weight_zero()] * N
-        #path = [heuristic_path(0, 0)] * N
-        path = [heuristic_path(weight.weight_zero(), weight.weight_zero())] * N
-        
+        coords = [point_t(0, 0)]*N
+
         for key, code in enumerate(airports.airports):
             if code is not None:
-                path[key].u = code.lat
-                path[key].v = code.lng
+                coords[key].u = code.lat
+                coords[key].v = code.lng
 
-        for i in range(N):
-            u = path[i].u - path[d].u
-            v = path[i].v - path[d].v
-            h[i] = weight.weight_t(sqrt(u ** 2 + v ** 2))
+        for u in range(0, N):
+            h[u] = coords_dist(coords, u, d)
 
         return h
 
