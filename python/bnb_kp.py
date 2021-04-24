@@ -86,7 +86,7 @@ class bnb(knapsack):
             print(s, end="")
         for i in range(sol.fixed + 1, self.Nitems + 1):
             print("x", end="")
-            i = i + 1;
+            i = i + 1
         print("")
         
     def frac_bound(self, sol, fix):
@@ -158,7 +158,43 @@ class bnb(knapsack):
   
 
         # YOUR CODE GOES HERE
+        solution = struc_sol()
+        self.copy_array(final_sol, solution.solution_vec)
+
+        solution.fixed = 0
+        self.frac_bound(solution, solution.fixed)
         
+        current_best = solution.val
+        upper_bound = solution.bound
+        
+        
+        self.insert(solution)
+        
+        while (self.QueueSize > 0) and (upper_bound > current_best):
+            head = self.removeMax()
+            if head.fixed >= self.Nitems:
+                break
+
+            head_1 = head.copy()
+            head_1.fixed += 1
+            head_1.solution_vec[head_1.fixed] = True
+
+            head_0 = head.copy()
+            head_0.fixed += 1
+            head_0.solution_vec[head_0.fixed] = False
+
+            children = []
+            children.append(head_1)
+            children.append(head_0)
+            for temp_head in children:
+                if temp_head.val >= 0:
+                    self.frac_bound(temp_head, temp_head.fixed)
+                    if temp_head.val > current_best:
+                        current_best = temp_head.val
+                        self.copy_array(temp_head.solution_vec, final_sol)
+                    self.insert(temp_head)
+
+
     def copy_array(self, array_from, array_to):
         # This copies Nitems elements of one boolean array to another
         # Notice it ignores the 0th item of the array

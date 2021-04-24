@@ -16,16 +16,32 @@ class enum_knapsack(knapsack):
         best_solution = [False]*(self.Nitems + 1) # (binary) solution veectore for best solution found
         j = 0.0
         
-        self.QUIET = False
+        self.QUIET = True
         best_value = 0 # total value packed in the best solution
+        
+        number_combinations = 2**self.Nitems - 1
         
         while (not self.next_binary(solution, self.Nitems)):
             # ADD CODE IN HERE TO KEEP TRACK OF FRACTION OF ENUMERATION DONE
             
+            j+= 1
+            fraction = j / number_combinations * 100
+
             # calculates the value and weight and feasibility
             infeasible = self.check_evaluate_and_print_sol(solution)
             
             # ADD CODE TO PRINT OUT BEST SOLUTION
+
+            if (best_value < self.total_value) and not infeasible:
+                best_value = self.total_value
+                best_solution = solution.copy()
+            
+            print("Percentage: %d/100  |  So far best value is %d" % (fraction, best_value), end="\r")
+            
+        print("\nDONE!\nBest solution is %s\nwith  best value = %d" % (str(best_solution), best_value))
+        self.QUIET = False
+        self.check_evaluate_and_print_sol(best_solution)
+
             
     def next_binary(self, sol, Nitems):
         # Called with a "binary" vector of length Nitmes, this

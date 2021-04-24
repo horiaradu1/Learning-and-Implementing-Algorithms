@@ -15,6 +15,12 @@ class greedy(knapsack):
         self.sort_by_ratio() # sort by profit-to-weight ratio
         
         # ADD CODE HERE TO COMPUTE THE GREEDY SOLUTION
+        total_weight = 0
+        for _ in range(len(self.temp_indexes)-1):
+            if self.Capacity >= (total_weight + self.item_weights[self.temp_indexes[i]]):
+                solution[i] = True
+                total_weight += self.item_weights[self.temp_indexes[i]]
+            i+=1
         
         # THE CODE SHOULD: take the items in descending
         # profit-to-weight ratio order (by using temp_indexes) and,

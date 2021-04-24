@@ -4,48 +4,113 @@ Dynamic Programming
 Why does the 0/1 Knapsack Problem have the three necessary properties for dynamic programming?
 
 1. Simple Subproblems
+    An optimal solution to this problem, would consist of optimal solutions to its subproblems.
+    The Knapsack Problem can be broken down into recurring subproblems.
+    To prove that it has the property; we are able to construct a 2D array, V[0...n,0...W].
+    For i and w (1<=i<=n, 0<=w<=W), V[i,w] will contain the maximum computing time of the subset of 1,2,3,...,i, with at most w weight.
+    After computing this whole 2D array, V[n,W] will then contain the maximum computing time of items in the storage, the optimal solution to the problem.
+    Therefore, the Knapsack Problem has this property.
 
 2. Subproblem Optimality
+    The Knapsack Problem has this property because when we solve the problem for different subset of items,
+    we then can just take maximum of those subproblems to get the most optimal solution to the whole problem.
+    Initially, we are able to set 0 for the array where there are no items and -infinite for the array where the weight is smaller than 0.
+    Then, between subproblems we can use a recursive step and get the maximum value between two subproblems, where one adds an item and one removes an item from solution.
+    We can get this by using max(V[i-1,w], v[i]+V[i-1,w-wv[i]]).
+    This calculation will choose the optimal solution for the next value of the array, and so on, recursively, until all the subproblems are solved,
+    and we get an optimal solution
+    Thus, the problem has this property by having the capability to solve subproblems optimally and recursively, until getting to the final optimal solution.
 
 3. Subproblem Overlap
+    Subproblems will overlap with each other, because they are recurring, thus the algorithm will revisit the same subproblems repeatedly.
+    We are able to store values and weights in the array and use them in our computing of the optimal solution.
+    This is done with the 2D array V[i,w], which will indeed take up more space, but take in consideration the whole data
+    when looking for the optimal solution, without recalculating it over and over again.
+    In conclusion we won't need to recalculate overlapping problems, which gives the Knapsack Problem this property.
 
 
 Greedy
 ======
 
 1.  Why is a greedy approach not necessarily optimal for 0/1 Knapsack?
+            When looking for the optimal solution in a 0/1 Knapsack, the algorithm will always take the item with the
+        highest value/weight ratio, which will not always be optimal.
+            This approach will not always fill the capacity with the best solution, as it does not consider all the data
+        of our items with the capacity.
+            Greedy approach takes in consideration when adding to a solution, choices made up to a certain point,
+        and not the whole data given.
+            For example, we have 2 items, with weights 3, 5 and values 10 and 15. Their ratios would both be 3.3 and 3.
+            If we were asked to take one of those two, lets say we have a capacity of just 5 weights, the optimal solution would be taking the second item,
+            but based on the ratio, it would select the first item that has only value of 10, thus not being able to fit the second one which had a higher value.
 
 2.  Is the greedy approach optimal for the Fractional Knapsack problem?  Explain your reasoning.
+            The greedy approach is indeed optimal for the Fractional Knapsack problem.
+            Because in the Fractional Knapsack you can take fractional parts of items, the greedy approach works very well
+        when going in order of value to weight ratio.
+            The solution will be filled in order of items having the highest value with the lowest weight, from best to worst.
+            And because we are able to take fractional parts, when reaching the capacity, we will be able to take just a part
+        of the last items in the solution, meaning we will get the highest value of the solution (optimal solution).
 
 Testing
 =======
 
 1.  Why can't you use full enumeration for large instances?
+    Suppose one evaluation of a solutions takes 1 microsecond, how large an instance do you think can be practically solved in an hour?  Justify your answer.
+        You can not use enumeration for too large instances, because the enumeration algorithm takes all possible solution in consideration
+        when providing a result.
+        This means that for each item added to an instance, the time taken for the algorithm to finish will be exponentially increased.
+        The number of iterations an enumeration will do in this for N number of possible items for a knapsack is 2 at the power of N
 
-Suppose one evaluation of a solutions takes 1 microsecond, how large an instance do you think can be practically solved in an hour?  Justify your answer.
+        In an hour there are 3600000000 microsecond.
+        If we take an instance of 31 numbers, it will take 2147483648 microsecond, which is below an hour.
+        Taking a instance of 32 numbers will take 4294967296 microsecond, double the time (exponentially increased), which will take over an hour, close to two.
+        Thus, the enumeration algorithm will be able to solve in an hour an instance of maximum 35 numbers.
+
 
 2.  Fill in the table below for each test set, noting whether or not you killed the algorithm.  Result should indicate whether the correct optimal solution has been found.  This should be 377 for easy.20.1.txt, 4077 for easy.200.4.txt, 126968 for hard1.200.11.txt and 1205259 for hard1.2000.1.txt.  You can generate this output using test.sh if you wish.
 
 ===========================================
-easy.20.1.txt 
+easy.20.1.txt for 120 seconds
 ===========================================
 Algorithm |      Optimal Value       | Time Taken  | Result
+----------------------------------------------------------------
+enum      | 377                      | 0m9,762s   | Yes
+bnb       | 377                      | 0m0,062s    | Yes
+dp        | 377                      | 0m0,028s    | Yes
+greedy    | 368                      | 0m0,029s    | ? (No)
+
 
 ===========================================
-easy.200.4.txt
+easy.200.4.txt for 120 seconds
 ===========================================
 Algorithm |      Optimal Value       | Time Taken  | Result
+----------------------------------------------------------------
+enum      | 313                      | 2m0,004s    | ? (killed)
+bnb       | 4077                     | 0m0,313s    | Yes
+dp        | 4077                     | 0m0,406s    | Yes
+greedy    | 4075                     | 0m0,030s    | ? (No)
+
 
 ===========================================
-hard1.200.11.txt
+hard1.200.11.txt for 120 seconds
 ===========================================
 Algorithm |      Optimal Value       | Time Taken  | Result
+----------------------------------------------------------------
+enum      | 17705                    | 2m0,004s    | ? (killed)
+bnb       | 126671                   | 0m24,168s   | ? (No)
+dp        | 126968                   | 0m11,218s   | Yes
+greedy    | 126579                   | 0m0,030s    | ? (No)
+
 
 ===========================================
-hard1.2000.1.txt
+hard1.2000.1.txt for 120 seconds
 ===========================================
 Algorithm |      Optimal Value       | Time Taken  | Result
-
+----------------------------------------------------------------
+enum      | -                        | 0m0,239s    | - (killed / OverflowError: int too large to convert to float)
+bnb       | -                        | 2m0,009s    | - (killed)
+dp        | -                        | 1m6,975s    | No (killed / ran out of memory)
+greedy    | 1205167                  | 0m0,053s    | ? (No)
 
 So for instance if you are running the program using the bnb algorithm on the hard1.200.11.txt and kill the program after it has been running for 1 minute and the best solution at that point has 126756 in the knapsack then you should note that you killed the program and write
 
@@ -59,31 +124,119 @@ Note that some knapsack implementations generate candidate solutions as they go 
 
 
 3.  Which instances does greedy solve optimally?
+    Greedy works on all instances, and in a good time, the only problem is that it does not give the optimal solution.
+    So that means that greedy solves no instance optimally.
+    But, most of the time the solution given will be very close to the optimal one.
 
 Does dynamic programming work on all instances and why/why not?
+    The dp does not work only on the hard long instance, but that is due to the memory I allocated for it.
+    Apart from that, it works on all of them.
 
 Does branch-and-bound come to a stop on all instances in reasonable time?
+    It comes to a stop in a reasonable time only on the easy ones, but not for the hard ones.
 
 4.  Can you explain WHY the hard1 instances are easy or hard (cause problems) for
+    Hard1 instances have bigger weights, values and capacities than the easy ones.
     i) greedy
+            Is easy for the hard1 instances, only problem being that it does not necessarily give the optimal solution,
+        but it is relatively close to it.
+            Greedy is easy for the hard1 instances because it has a very straight forward approach to a problem,
+        and a very time and space efficient solution.
+            It is to be noted that the time complexity of Greedy Algorithm (O(nlogn)), similar to Quick Sort, does not increase based on the harder weights,
+        only on the length on the input instance.
+            A main reason that this holds is that Greedy does not take into consideration the weights and values of the items, but rather
+        their value/weight ratios, and then the Knapsack is filled till capacity.
+            As this algorithm will just sort ratios and put them in an order until capacity is reached, big values, weights will have no impact
+        and cause no problems for hard1 instances.
+
     ii) branch-and-bound
+            Is hard for hard1 instances, because of the high weights and capacity, and instances with a lot of items.
+            Because of this the branch and bound algorithm will be forced to try out a lot more combinations and set fixed values for the optimal solution.
+            It will add a lot of those partial solutions to the priority queue and take a lot of time, while also using a lot of memory.
+            And also it will be hard for it to get an optimal solution because of the big and hard instance.
+        
     iii) dynamic programming
+            Is pretty easy and optimal for all the instances except the hard1.2000.1, where it gets killed.
+            This happens from the lack of memory. From this we can conclude that even though it works fast and good for smaller and harder instances,
+        it may face memory issues for bigger instances.
+            This is because of the matrixes it has to create and manage, and all the subproblems that it makes, which will use up a lot of space.
+            It is to be noted that the time complexity of the dynamic programming is O(n*w), thus it also takes in consideration the number of items and their weights,
+        so, the hard1 instances will have an impact on the performance of the algorithm.
 
 
-5.  The airline has problems of size 500-2000 of similar type to the hard1 instances.  Which algorithms do you recommend using and why?
+5.  The airline has problems of size 500-2000 of similar type to the hard1 instances. Which algorithms do you recommend using and why?
+    Considering the airline had enough memory and wouldn't mind trading space for time effiecency and an optimal solution:
+    The algorithm I'd recommend is dynamic programming.
+    Even though it is not faster than Greedy, it gives an optimal solution compared to Greedy, which doesn't always give one.
+    And it will not face a problem with larger and harder instances, as long as more memory and time is allocated.
+    It is more stable and consistent than the other algorithms.
 
 What should they do in the case the algorihm runs out of time?
+    In case the algorithm runs out of time, an option could be using the Greedy algorithm as it works for larger instances and takes far less time.
+    Indeed, it will not give the optimal solution every time, but if the algorithm runs out of time, this would be a viable alternative. 
+    It can be seen that in hard1 case with size 2000, the greedy algorithm gave a result of 1205167, with the correct one being 1205259.
+    While it was not the optimal, it was very close to the optimal one.
 
 Linear Programming
 ==================
 
-1.  Describe how we can use the Simplex algorithm to solve the Fractional Knapsack problem. You should begin by clearly stating the fractional knapsack problem and then describe the steps required to transform this into the input to the Simplex algorithm. You should also comment on how the solution generated by the Simplex algorithm can be translated into a solution the Fractional Knapsack problem.
+1.  Describe how we can use the Simplex algorithm to solve the Fractional Knapsack problem.
+    You should begin by clearly stating the fractional knapsack problem and then describe the steps required to transform this into the input to the Simplex algorithm.
+    You should also comment on how the solution generated by the Simplex algorithm can be translated into a solution the Fractional Knapsack problem.
+        The Fractional Knapsack problem is very similar to 0/1 Knapsack, only that we are able to take fractional parts of items, part of their value and weight.
+        To transform the Fractional Knapsack into the input for the Simplex algorithm is similar to the 0/1 Problem:
+        We will have to make it into the standard form. We will have three types of values plus a capacity C;
+        The three types are (for items 1 to n):
+                x[1],x[2],...x[n] - Those are for the items, they can be between 0 or 1, depending on how much you take of each item (!The problem being Fractional!)
+                w[1],w[2],...w[n] - Those are for the weights of the items
+                v[1],v[2],...v[n] - Those are for the values of the items
+        Then we will have to maximise the problem by making the sum of all values of the items times how much of the item we are going to take:
+            Sum of (i from 1 to n) of (v[i]*x[i]) where the unknown variables will be the x[i]'s, because we already know the values of each item
+            The maximise will look something like this:
+                v[1]*x[1] + v[2]*x[2] + ... + v[n]*x[n]
+                But with the values already known.
+        Next we are going to have to make the constraints of the problem, based on the items weights:
+            Sum of (i from 1 to n) of (w[i]*x[i]) where the unknown variables will be the x[i]'s, which whill have to be smaller than C
+            The constraints will look something like this:
+                w[1]*x[1] + w[2]*x[2] + ... + w[n]*x[n] <= C (capacity)
+                But with the weights already known.
+                And we will also need constraints for each weight and item:
+                w[1]*x[1] <= 1; w[2]*x[2] <= 1; w[3]*x[3] <= 1;... (because we are having a fractional problem)
+        After this we would have to add slack variables to the constraints, S, S[1],S[2],...S[n], so that we go from a Standard form to a Slack form
+            Which will look something like this:
+                w[1]*x[1] + w[2]*x[2] + ... + w[n]*x[n] + S = C (capacity)
+                This makes it so that the addition of the slack variable will make the form be = to C, with S = C.
+                And similar to what we had above, we will need a slack variable for each smaller constraint:
+                w[1]*x[1] +S[1] = 1; w[2]*x[2] +S[2] = 1; w[3]*x[3] +S[3] = 1;... (where S will be 1)
+            The Slack variable has the purpose of making the Inequality of the constraints, an equality.
+        Next we will need to get an optimal solution through the Simplex Algorithm, transform it's solution to a solution for the Fractional Knapsack Problem.
+            After the algorithm generates a solution, this solution will be translated into a solution
+            for the Fractional Knapsack Problem by getting the values of the: x[1],x[2],...x[n], which will give us how much of each item we will take for the solution.
+            We will be able to get those values from the matrix that we computed with the Simplex method.
 
 2.  Will the previous approach always provide the optimal solution (explain)?
+    Yes, it will always provide the optimal solution.
+    Based on the graph for linear programming, the Simplex Algorithm will always find the optimal solution. This solution will be at the vertexes
+    of the constraints with the variables axis, and of course in the feasible solution range of the graph defined by the constraints.
+    In the case of the Fractional Knapsack Problem, because we are able to take part of the items, the items value (ratio of how much we will take out of it),
+    will be between 0 and 1. Thus, those constraints, together with the capacity-weight one, will be able to point out, through the Simplex Algorithm,
+    the exact vertex/intersection in the graph that will be the optimal solution for the Fractional Knapsack Problem.
 
 How does its complexity compare to the greedy approach for the Fractional Knapsack problem?
+    Simplex algorithm has linear polynomial time complexity (O(n)), because it has only one constraint.
+    Greedy approach for the Fractional Knapsack is O(n*log(n)), same as 0/1 Knapsack, because all it does is sort by value/weight ratio.
+    Thus, the Simplex algorithm is faster than Greedy, for the Fractional Knapsack problem.
 
 3. What is the difference between a linear program and a mixed integer linear program? You should comment on the comparative complexity of the two problems.
+    A linear program can be used to solve efficiently problems with large number of variables and constraints.
+    But, when some variables are required to take integer values, while other variables are allowed to be non-integers, we will need to use a mixed integer linear program,
+    thus, having a set of linear constraints over integer variables.
+    Their complexity's will have a chance to differ, with the mixed integer linear program complexity being a bit better.
+    The difference between them is that, the mixed integer linear program, because of having some variables with only integer values, might have less vertexes (solutions)
+    in the feasible range of the graph, thus needing to compute less of them and resulting in a better complexity.
 
 4. Look up the concept of a relaxation of a (mixed) integer linear program and explain how it might let us use the Simplex algorithm to solve the 0/1 Knapsack problem.
-
+    The relaxation concept transforms an NP-hard problem (integer programming) into a related problem that is solvable in polynomial time (linear programming).
+    The solution of a relaxed (mixed) integer linear program can be used to gain information about the solution to the original integer program.
+    So, with the relaxation we will be able to transform the 0/1 Knapsack problem, an NP-hard problem that can not be calculated in polynomial time,
+    into a linear programming problem, solvable in polynomial time, thus letting us use the Simple algorihm to solve it.
