@@ -188,6 +188,7 @@ Linear Programming
         We will have to make it into the standard form. We will have three types of values plus a capacity C;
         The three types are (for items 1 to n):
                 x[1],x[2],...x[n] - Those are for the items, they can be between 0 or 1, depending on how much you take of each item (!The problem being Fractional!)
+                And x[i] >= 0.
                 w[1],w[2],...w[n] - Those are for the weights of the items
                 v[1],v[2],...v[n] - Those are for the values of the items
         Then we will have to maximise the problem by making the sum of all values of the items times how much of the item we are going to take:
@@ -200,8 +201,8 @@ Linear Programming
             The constraints will look something like this:
                 w[1]*x[1] + w[2]*x[2] + ... + w[n]*x[n] <= C (capacity)
                 But with the weights already known.
-                And we will also need constraints for each weight and item:
-                w[1]*x[1] <= 1; w[2]*x[2] <= 1; w[3]*x[3] <= 1;... (because we are having a fractional problem)
+                And we will also need constraints for each item:
+                x[1] <= 1; x[2] <= 1; x[3] <= 1;... (because we are having a fractional problem, where we are able to get only between 0 and 1 of an item)
         After this we would have to add slack variables to the constraints, S, S[1],S[2],...S[n], so that we go from a Standard form to a Slack form
             Which will look something like this:
                 w[1]*x[1] + w[2]*x[2] + ... + w[n]*x[n] + S = C (capacity)
@@ -221,6 +222,7 @@ Linear Programming
     In the case of the Fractional Knapsack Problem, because we are able to take part of the items, the items value (ratio of how much we will take out of it),
     will be between 0 and 1. Thus, those constraints, together with the capacity-weight one, will be able to point out, through the Simplex Algorithm,
     the exact vertex/intersection in the graph that will be the optimal solution for the Fractional Knapsack Problem.
+    This approach will maximise our solution, based on the constraints, until we get to an optimal one.
 
 How does its complexity compare to the greedy approach for the Fractional Knapsack problem?
     Simplex algorithm has linear polynomial time complexity (O(n)), because it has only one constraint.
